@@ -1,26 +1,141 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
+/*
+ * Tradesman Global design tokens.
+ * Names follow shadcn/ui conventions so shared primitives and our own
+ * components use one vocabulary. Components use Tailwind names
+ * (bg-card, text-muted-foreground, bg-navy …), never raw hex.
+ * Light-only by design: the brand is a soft-blue, daylight identity.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 1rem;
+
+  --background: #f7fafe;
+  --foreground: #102a43;
+  --card: #ffffff;
+  --card-foreground: #102a43;
+  --popover: #ffffff;
+  --popover-foreground: #102a43;
+
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #eaf4ff;
+  --secondary-foreground: #102a43;
+  --muted: #eef3f9;
+  --muted-foreground: #64748b;
+  --accent: #eaf4ff;
+  --accent-foreground: #102a43;
+  --destructive: #dc2626;
+
+  --border: #e2e8f0;
+  --input: #dbe3ee;
+  --ring: #3b82f6;
+
+  /* Brand extensions */
+  --navy: #102a43;
+  --navy-deep: #071d35;
+  --brand-blue: #3b82f6;
+  --sky: #eaf4ff;
+  --emerald: #10b981;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-brand-blue: var(--brand-blue);
+  --color-sky: var(--sky);
+  --color-emerald: var(--emerald);
+
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 6px);
+  --radius-lg: calc(var(--radius) - 4px);
+  --radius-xl: var(--radius);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 16px);
+
+  --font-sans: var(--font-jakarta), var(--font-noto-bengali), ui-sans-serif, system-ui, sans-serif;
+  --font-bengali: var(--font-noto-bengali), var(--font-jakarta), sans-serif;
+
+  /* Soft, layered elevation used across cards (reference: floating UI). */
+  --shadow-soft: 0 1px 2px rgb(16 42 67 / 0.04), 0 8px 24px -6px rgb(16 42 67 / 0.08);
+  --shadow-float: 0 2px 6px rgb(16 42 67 / 0.05), 0 24px 48px -12px rgb(37 99 235 / 0.18);
+
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+  :lang(bn) {
+    @apply font-bengali;
+    line-height: 1.75;
+  }
+}
+
+/* Space reserved for the mobile bottom tab bar (64px + iOS home indicator). */
+@utility pb-tabbar {
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+}
+@utility bottom-tabbar {
+  bottom: calc(4.5rem + env(safe-area-inset-bottom));
+}
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Faint dot grid used behind light sections (reference: page backgrounds). */
+@utility bg-dot-grid {
+  background-image: radial-gradient(rgb(16 42 67 / 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+@utility bg-hero-glow {
+  background:
+    radial-gradient(60% 60% at 15% 10%, rgb(59 130 246 / 0.18), transparent 70%),
+    radial-gradient(50% 60% at 90% 30%, rgb(37 99 235 / 0.14), transparent 70%),
+    linear-gradient(180deg, #eaf4ff 0%, #f7fafe 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -44,6 +44,7 @@ Features: `homepage`, `candidates`, `workers`, `registration`, `worker-dashboard
 - Service functions start with `"use cache"` (Cache Components is enabled in `next.config.ts`; `dynamicParams` is unavailable). Dynamic routes use `generateStaticParams` + `notFound()`.
 - Features reference other features' entities by **slug only** (e.g. `Country.inDemandTradeSlugs`). Route pages do the join by calling both features' public APIs.
 - Exception: a feature that *extends* another's entity may import that feature's barrel, one direction only. Current edges: `workers → candidates` (`WorkerProfile = Candidate & details`). Never add the reverse edge.
+- Client Components (`"use client"`) must not import a feature barrel that exports services (they carry `"use cache"` server code). Render that feature's components in a Server Component and pass them down as props/children.
 - Composition features (`homepage`) may read other features' barrels in their `services/` and map into their own view-model types. Nothing may import a composition feature.
 - Only `approved` candidates/workers are ever public; services enforce this, not the UI.
 - Link URLs come from `routes` in `src/lib/constants/routes.ts`; never hard-code paths.

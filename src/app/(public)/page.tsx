@@ -1,12 +1,12 @@
+import { PageTransition } from "@/components/animations";
 import {
   DestinationsSection,
   FeaturedWorkersSection,
   FinalCtaSection,
   HeroSection,
   HowItWorksSection,
-  PopularTradesSection,
-  SearchSection,
-  SkillsShowcaseSection,
+  SkillsGallerySection,
+  TalentIntroSection,
   VideoResumeSection,
   getHomepageData,
 } from "@/features/homepage";
@@ -15,21 +15,23 @@ export default async function HomePage() {
   const data = await getHomepageData();
 
   return (
-    <>
-      <HeroSection destinationCount={data.stats.destinations} />
-      <SearchSection
-        tradeOptions={data.tradeOptions}
-        countryOptions={data.countryOptions}
-        experienceOptions={data.experienceOptions}
-        stats={data.stats}
-      />
-      <PopularTradesSection trades={data.popularTrades} />
-      <FeaturedWorkersSection workers={data.featuredWorkers} />
-      <VideoResumeSection />
-      <HowItWorksSection />
-      <SkillsShowcaseSection />
-      <DestinationsSection destinations={data.destinations} />
-      <FinalCtaSection />
-    </>
+    <PageTransition>
+      <div>
+        <HeroSection
+          stats={data.stats}
+          globe={data.globe}
+          tradeOptions={data.tradeOptions}
+          countryOptions={data.countryOptions}
+          experienceOptions={data.experienceOptions}
+        />
+        <TalentIntroSection stats={data.stats} />
+        <SkillsGallerySection trades={data.popularTrades} />
+        <FeaturedWorkersSection workers={data.featuredWorkers} />
+        <VideoResumeSection />
+        <HowItWorksSection />
+        <DestinationsSection destinations={data.destinations} />
+        <FinalCtaSection />
+      </div>
+    </PageTransition>
   );
 }

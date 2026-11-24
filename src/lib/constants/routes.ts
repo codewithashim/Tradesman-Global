@@ -14,7 +14,7 @@ export const routes = {
   tradeCategories: "/trade-categories",
   /** Homepage section anchor until a dedicated destinations page exists. */
   destinations: "/#destinations",
-  howItWorks: "/how-it-works",
+  howItWorks: "/#how-it-works",
   login: "/login",
   register: "/register",
   trade: (slug: string) => `/trade/${slug}`,

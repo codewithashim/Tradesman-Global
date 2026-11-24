@@ -28,19 +28,3 @@ export const popularTradeGroups: Record<string, string[]> = {
   mason: ["mason", "tiler", "plasterer"],
   "heavy-vehicle-driver": ["heavy-vehicle-driver", "light-vehicle-driver"],
 };
-
-/** Home districts shown in the hero trust strip. */
-export const featuredDistricts = [
-  "Dhaka",
-  "Chattogram",
-  "Cumilla",
-  "Sylhet",
-  "Noakhali",
-  "Tangail",
-  "Brahmanbaria",
-  "Mymensingh",
-  "Narsingdi",
-  "Khulna",
-  "Rajshahi",
-  "Barishal",
-];

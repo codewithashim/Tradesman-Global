@@ -12,6 +12,7 @@ export const countries: Country[] = [
     isoCode: "AE",
     region: "Middle East",
     capital: "Abu Dhabi",
+    coordinates: { lat: 24.45, lng: 54.38 },
     currency: "UAE Dirham (AED)",
     summary: "Large-scale construction, hospitality and infrastructure projects.",
     overview:
@@ -30,6 +31,7 @@ export const countries: Country[] = [
     isoCode: "SA",
     region: "Middle East",
     capital: "Riyadh",
+    coordinates: { lat: 24.71, lng: 46.68 },
     currency: "Saudi Riyal (SAR)",
     summary: "Giga-projects and industrial expansion driving trade hiring.",
     overview:
@@ -47,6 +49,7 @@ export const countries: Country[] = [
     isoCode: "QA",
     region: "Middle East",
     capital: "Doha",
+    coordinates: { lat: 25.29, lng: 51.53 },
     currency: "Qatari Riyal (QAR)",
     summary: "Infrastructure, LNG and facilities maintenance.",
     overview:
@@ -64,6 +67,7 @@ export const countries: Country[] = [
     isoCode: "RO",
     region: "Europe",
     capital: "Bucharest",
+    coordinates: { lat: 44.43, lng: 26.1 },
     currency: "Romanian Leu (RON)",
     summary: "EU-funded infrastructure and growing construction sector.",
     overview:
@@ -78,6 +82,7 @@ export const countries: Country[] = [
     isoCode: "MY",
     region: "Asia-Pacific",
     capital: "Kuala Lumpur",
+    coordinates: { lat: 3.14, lng: 101.69 },
     currency: "Malaysian Ringgit (MYR)",
     summary: "Construction, manufacturing and plantation-sector demand.",
     overview:
@@ -95,6 +100,7 @@ export const countries: Country[] = [
     isoCode: "IT",
     region: "Europe",
     capital: "Rome",
+    coordinates: { lat: 41.9, lng: 12.5 },
     currency: "Euro (EUR)",
     summary: "Seasonal and non-seasonal quotas for construction, hospitality and agriculture.",
     overview:
@@ -112,6 +118,7 @@ export const countries: Country[] = [
     isoCode: "PT",
     region: "Europe",
     capital: "Lisbon",
+    coordinates: { lat: 38.72, lng: -9.14 },
     currency: "Euro (EUR)",
     summary: "Construction boom and tourism-driven hospitality demand.",
     overview:
@@ -129,6 +136,7 @@ export const countries: Country[] = [
     isoCode: "SG",
     region: "Asia-Pacific",
     capital: "Singapore",
+    coordinates: { lat: 1.35, lng: 103.82 },
     currency: "Singapore Dollar (SGD)",
     summary: "Construction, marine and process sectors with skills-tested entry.",
     overview:

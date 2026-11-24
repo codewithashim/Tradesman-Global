@@ -32,15 +32,15 @@ export function ActiveFilterChips({ tradeOptions, countryOptions }: { tradeOptio
   return (
     <ul aria-label="Active filters" className="flex flex-wrap items-center gap-2">
       {chips.map((chip) => (
-        <li key={chip.label}>
+        <li key={chip.label} className="animate-in fade-in zoom-in-90 duration-300">
           <button
             type="button"
             onClick={() => updateFilters(chip.clear)}
             aria-label={`Remove filter: ${chip.label}`}
-            className="group inline-flex items-center gap-1.5 rounded-full bg-navy py-1.5 pl-3.5 pr-2 text-sm font-medium text-white transition hover:bg-navy-deep"
+            className="group inline-flex items-center gap-1.5 rounded-full bg-sky py-1.5 pl-3.5 pr-1.5 text-sm font-semibold text-navy ring-1 ring-primary/20 transition-all duration-300 hover:bg-navy hover:text-white"
           >
             {chip.label}
-            <span className="grid size-5 place-items-center rounded-full bg-white/15 group-hover:bg-white/25">
+            <span className="grid size-5 place-items-center rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:rotate-90 group-hover:bg-white/20 group-hover:text-white">
               <X aria-hidden className="size-3" />
             </span>
           </button>

@@ -7,6 +7,8 @@ export interface Country {
   isoCode: string;
   region: CountryRegion;
   capital: string;
+  /** Capital city position, used by map and globe visuals. */
+  coordinates: { lat: number; lng: number };
   currency: string;
   /** One line, used on cards. */
   summary: string;

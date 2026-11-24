@@ -7,9 +7,8 @@ import { routes } from "@/lib/constants/routes";
 import { siteConfig } from "@/lib/constants/site";
 import { DesktopNav } from "./desktop-nav";
 import { HeaderShell } from "./header-shell";
-import type { SiteNavData } from "./nav-types";
 
-export function SiteHeader({ nav }: { nav: SiteNavData }) {
+export function SiteHeader() {
   return (
     <>
       {/* Utility strip — desktop only; mobile keeps the screen for content. */}
@@ -18,9 +17,6 @@ export function SiteHeader({ nav }: { nav: SiteNavData }) {
           <p className="flex items-center gap-2">
             <BadgeCheck aria-hidden className="size-3.5 text-brand-blue" />
             Every profile is reviewed by our team before it’s listed.
-            <span lang="bn" className="text-white/50">
-              · বিনামূল্যে প্রোফাইল তৈরি করুন
-            </span>
           </p>
           <div className="flex items-center gap-5">
             <span className="flex items-center gap-1.5">
@@ -36,7 +32,7 @@ export function SiteHeader({ nav }: { nav: SiteNavData }) {
       <HeaderShell>
         <Container className="flex h-16 items-center justify-between gap-4 lg:h-[72px]">
           <BrandLogo />
-          <DesktopNav nav={nav} />
+          <DesktopNav />
 
           <div className="flex items-center gap-2">
             {/* Mobile: quick search + sign in (primary nav lives in the bottom tab bar). */}

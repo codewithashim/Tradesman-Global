@@ -1,8 +1,6 @@
-import Image from "next/image";
-import { ArrowRight, Play, UserPlus } from "lucide-react";
+import { ArrowRight, UserPlus } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Magnetic } from "@/components/animations";
-import { siteImages } from "@/config/images";
 import { routes } from "@/lib/constants/routes";
 import type { Option } from "@/types/common";
 import { HeroSearchForm } from "../components/hero-search-form";
@@ -18,15 +16,7 @@ interface HeroSectionProps {
   experienceOptions: Option[];
 }
 
-/** Skills that drift around the globe: the kind of detail a profile shows. */
-const skillTags = [
-  { label: "6G pipe welding", className: "right-[4%] top-[4%]" },
-  { label: "3-phase wiring", className: "right-[0%] bottom-[22%]" },
-  { label: "Tile setting", className: "left-[46%] bottom-[2%] max-sm:hidden" },
-];
-
 export function HeroSection({ stats, globe, tradeOptions, countryOptions, experienceOptions }: HeroSectionProps) {
-  const photo = siteImages.heroWorker;
 
   return (
     <section className="px-2 pt-2 sm:px-3 sm:pt-3">
@@ -73,58 +63,16 @@ export function HeroSection({ stats, globe, tradeOptions, countryOptions, experi
               </ButtonLink>
             </div>
 
-            <p data-hero="fade" data-anim="hide" lang="bn" className="mt-6 text-sm text-white/50">
-              আপনার দক্ষতা দেখান বিশ্বকে — প্রোফাইল তৈরি সম্পূর্ণ ফ্রি।
-            </p>
           </div>
 
-          {/* Stage: globe, photo, video preview, drifting skills */}
-          <div className="relative -mx-3 sm:mx-auto sm:w-full sm:max-w-xl lg:col-span-6 lg:-mr-20 lg:-mt-8 lg:max-w-none">
+          {/* Stage: the globe */}
+          <div className="relative -mx-3 sm:mx-auto sm:w-full sm:max-w-xl lg:col-span-6 lg:-mr-12 lg:-mt-6 lg:max-w-none">
             <div data-hero="globe" data-anim="hide">
               <RouteGlobe origin={globe.origin} destinations={globe.destinations} />
             </div>
             <p className="sr-only">
-              Routes from {globe.origin.label} to {globe.destinations.map((d) => d.label).join(", ")}.
+              Routes from {globe.origin.city} to {globe.destinations.map((d) => d.label).join(", ")}.
             </p>
-
-            <figure
-              data-hero="photo"
-              data-anim="hide"
-              className="absolute bottom-[2%] left-[4%] w-[33%] overflow-hidden rounded-[1.25rem] shadow-2xl shadow-black/40 ring-1 ring-white/15 sm:rounded-3xl lg:bottom-[6%] lg:left-[-2%] lg:w-[32%]"
-            >
-              <div className="relative aspect-[3/4]">
-                <Image src={photo.src} alt={photo.alt} fill priority sizes="(min-width: 1024px) 15rem, 38vw" className="object-cover object-[50%_62%]" />
-                <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-navy-deep/85 via-transparent to-transparent" />
-                <figcaption className="absolute inset-x-3 bottom-3 flex items-center gap-2 text-left sm:inset-x-4 sm:bottom-4">
-                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-white text-primary sm:size-9">
-                    <Play aria-hidden className="ml-0.5 size-3.5 sm:size-4" fill="currentColor" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-[11px] font-semibold leading-tight sm:text-xs">Video resume</span>
-                    <span className="block text-[10px] text-white/60 sm:text-[11px]">Skills on camera</span>
-                  </span>
-                </figcaption>
-              </div>
-            </figure>
-
-            <ul aria-hidden className="pointer-events-none">
-              {skillTags.map((tag, i) => (
-                <li
-                  key={tag.label}
-                  data-hero="tag"
-                  data-anim="hide"
-                  className={`absolute ${tag.className}`}
-                >
-                  <span
-                    style={{ animationDelay: `${i * 1.6}s` }}
-                    className="flex animate-float items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur-md"
-                  >
-                    <span className="size-1.5 rounded-full bg-emerald" />
-                    {tag.label}
-                  </span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
 

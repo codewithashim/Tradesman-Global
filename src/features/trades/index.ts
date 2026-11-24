@@ -24,3 +24,4 @@ export { TradeGrid } from "./components/trade-grid";
 export { TradeIcon } from "./components/trade-icon";
 export { TradeCategoryDirectory } from "./components/trade-category-directory";
 export { TradeDetail, TradeHero } from "./components/trade-detail";
+export { TradesHero } from "./components/trades-hero";

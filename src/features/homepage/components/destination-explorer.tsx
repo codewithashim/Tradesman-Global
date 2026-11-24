@@ -233,7 +233,7 @@ export function DestinationExplorer({ destinations, flags }: DestinationExplorer
             <dt className="flex items-center gap-1.5 text-xs text-white/55">
               <Coins aria-hidden className="size-3.5" /> Currency
             </dt>
-            <dd className="mt-1 truncate font-semibold">{current.currency}</dd>
+            <dd className="mt-1 text-sm font-semibold leading-snug sm:text-base">{current.currency}</dd>
           </div>
         </dl>
 

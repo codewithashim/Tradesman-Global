@@ -42,12 +42,13 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
               <button
                 type="button"
                 onClick={() => setActiveIndex(index)}
-                className="group relative flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-soft ring-1 ring-border/70 transition hover:-translate-y-0.5 hover:shadow-float focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/50"
+                className="group relative flex h-full w-full flex-col overflow-hidden rounded-2xl bg-navy text-left shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-float focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/50 active:scale-[0.98]"
               >
                 <span className="relative block min-h-0 flex-1 overflow-hidden">
                   <PortfolioImage
                     item={item}
-                    className="aspect-4/3 size-full transition duration-500 group-hover:scale-[1.03] sm:aspect-auto"
+                    compact
+                    className="aspect-4/3 size-full transition duration-700 group-hover:scale-105 sm:aspect-auto"
                   />
                 </span>
                 {item.imageUrl ? (
@@ -59,12 +60,10 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
                     {meta && <span className="block truncate text-xs text-white/70">{meta}</span>}
                   </span>
                 ) : (
-                  // Over placeholders: a clean caption bar.
-                  <span className="block shrink-0 border-t border-border/70 px-4 py-2.5">
-                    <span className={cn("block truncate font-semibold text-navy", featured ? "text-base" : "text-sm")}>
-                      {item.title}
-                    </span>
-                    {meta && <span className="block truncate text-xs text-muted-foreground">{meta}</span>}
+                  // Over placeholders: caption on the dark tile.
+                  <span className="absolute inset-x-0 bottom-0 px-4 pb-3.5">
+                    <span className={cn("block truncate font-semibold text-white", featured ? "text-lg" : "text-sm")}>{item.title}</span>
+                    <span className="block truncate text-xs text-white/55">{meta ? `${meta} · photo coming soon` : "Photo coming soon"}</span>
                   </span>
                 )}
               </button>
@@ -82,7 +81,7 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
           if (event.key === "ArrowRight") step(1);
           if (event.key === "ArrowLeft") step(-1);
         }}
-        className="m-auto w-[min(56rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border-0 bg-card p-0 shadow-float text-foreground backdrop:bg-black/70"
+        className="m-auto w-[min(56rem,calc(100vw-2rem))] overflow-hidden rounded-[2rem] border-0 bg-card p-0 text-foreground shadow-float backdrop:bg-navy-deep/80 backdrop:backdrop-blur-sm open:animate-in open:fade-in open:zoom-in-95"
       >
         {active && activeIndex !== null && (
           <div className="flex flex-col">

@@ -73,9 +73,8 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 16px);
 
-  --font-sans: var(--font-jakarta), var(--font-noto-bengali), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-bricolage), var(--font-noto-bengali), var(--font-jakarta), sans-serif;
-  --font-bengali: var(--font-noto-bengali), var(--font-jakarta), sans-serif;
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-jakarta), sans-serif;
 
   /* Soft, layered elevation used across cards (reference: floating UI). */
   --shadow-soft: 0 1px 2px rgb(16 42 67 / 0.04), 0 8px 24px -6px rgb(16 42 67 / 0.08);
@@ -102,10 +101,6 @@
   }
   body {
     @apply bg-background font-sans text-foreground antialiased;
-  }
-  :lang(bn) {
-    @apply font-bengali;
-    line-height: 1.75;
   }
 }
 
@@ -135,6 +130,21 @@
     radial-gradient(60% 60% at 15% 10%, rgb(59 130 246 / 0.18), transparent 70%),
     radial-gradient(50% 60% at 90% 30%, rgb(37 99 235 / 0.14), transparent 70%),
     linear-gradient(180deg, #eaf4ff 0%, #f7fafe 100%);
+}
+
+@keyframes ken-burns {
+  from { transform: scale(1); }
+  to { transform: scale(1.12) translate(-1.5%, -1%); }
+}
+
+@keyframes marquee-y {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+
+@keyframes indeterminate {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
 }
 
 @keyframes grow-x {

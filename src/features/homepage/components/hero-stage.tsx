@@ -6,7 +6,7 @@ import { media } from "@/lib/animations/motion";
 
 /**
  * The homepage's one orchestrated moment: headline lines rise, the globe
- * settles in, the work photo is unmasked and skills drift into place.
+ * settles in and the search rises.
  * Content is server-rendered; this only choreographs it.
  */
 export function HeroStage({ children, className }: { children: ReactNode; className?: string }) {
@@ -26,14 +26,7 @@ export function HeroStage({ children, className }: { children: ReactNode; classN
         tl.from(q("[data-hero='kicker']"), { y: 16, autoAlpha: 0, duration: 0.8 })
           .from(split.lines, { yPercent: 115, duration: 1.4, stagger: 0.12 }, 0.1)
           .from(q("[data-hero='fade']"), { y: 24, autoAlpha: 0, duration: 1, stagger: 0.08 }, 0.55)
-          .from(q("[data-hero='globe']"), { scale: 0.86, autoAlpha: 0, rotate: -8, duration: 2 }, 0.2)
-          .fromTo(
-            q("[data-hero='photo']"),
-            { clipPath: "inset(100% 0% 0% 0%)", y: 40 },
-            { clipPath: "inset(0% 0% 0% 0%)", y: 0, duration: 1.4, ease: "power4.out", clearProps: "clipPath" },
-            0.7,
-          )
-          .from(q("[data-hero='tag']"), { scale: 0.6, autoAlpha: 0, duration: 0.9, stagger: 0.15, ease: "back.out(1.8)" }, 1.1)
+          .from(q("[data-hero='globe']"), { scale: 0.9, autoAlpha: 0, duration: 2 }, 0.2)
           .from(q("[data-hero='search']"), { y: 40, autoAlpha: 0, duration: 1.1 }, 0.9);
 
         // Leaving the hero: the stage sinks back slightly (desktop only, see below).
@@ -43,11 +36,6 @@ export function HeroStage({ children, className }: { children: ReactNode; classN
       mm.add(media.desktop, () => {
         gsap.to(q("[data-hero='globe']"), {
           yPercent: 12,
-          ease: "none",
-          scrollTrigger: { trigger: ref.current, start: "top top", end: "bottom top", scrub: true },
-        });
-        gsap.to(q("[data-hero='photo']"), {
-          yPercent: -18,
           ease: "none",
           scrollTrigger: { trigger: ref.current, start: "top top", end: "bottom top", scrub: true },
         });

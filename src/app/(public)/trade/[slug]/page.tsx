@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Search, UserPlus } from "lucide-react";
+import { ArrowUpRight, Search, UserPlus } from "lucide-react";
+import { PageTransition } from "@/components/animations";
 import { Container } from "@/components/ui/container";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SectionIntro } from "@/components/shared/section-intro";
-import { getCandidateCountsByTrade } from "@/features/candidates";
+import { CandidateCard, getCandidateCountsByTrade, getSimilarCandidates } from "@/features/candidates";
 import { CountryGrid, getCountriesHiringTrade } from "@/features/countries";
 import {
   TradeDetail,
@@ -35,17 +36,19 @@ export default async function TradePage({ params }: PageProps<"/trade/[slug]">) 
   const trade = await getTradeBySlug(slug);
   if (!trade) notFound();
 
-  const [categories, related, hiringCountries, counts] = await Promise.all([
+  const [categories, related, hiringCountries, counts, workers] = await Promise.all([
     getTradeCategories(),
     getRelatedTrades(trade),
     getCountriesHiringTrade(trade.slug),
     getCandidateCountsByTrade(),
+    getSimilarCandidates("", trade.slug, 3),
   ]);
   const category = categories.find((c) => c.id === trade.categoryId) ?? null;
   const profileCount = counts[trade.slug] ?? 0;
 
   return (
-    <>
+    <PageTransition>
+      <div>
       <TradeHero
         trade={trade}
         category={category}
@@ -70,6 +73,27 @@ export default async function TradePage({ params }: PageProps<"/trade/[slug]">) 
       <Container className="flex flex-col gap-16 py-12 sm:gap-20 sm:py-16">
         <TradeDetail trade={trade} />
 
+        {workers.length > 0 && (
+          <section className="flex flex-col gap-8">
+            <SectionIntro
+              eyebrow={trade.name}
+              title="Profiles you can contact."
+              action={
+                <ButtonLink href={routes.findCandidatesFor({ trade: trade.slug })} variant="secondary">
+                  See all {profileCount} <ArrowUpRight />
+                </ButtonLink>
+              }
+            />
+            <ul className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 xl:grid-cols-3">
+              {workers.map((candidate) => (
+                <li key={candidate.id} className="w-[85%] shrink-0 snap-center md:w-auto">
+                  <CandidateCard candidate={candidate} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {hiringCountries.length > 0 && (
           <section className="flex flex-col gap-8">
             <SectionIntro eyebrow="Destinations" title={`Where ${trade.name.toLowerCase()}s`} highlight="are in demand." />
@@ -80,10 +104,11 @@ export default async function TradePage({ params }: PageProps<"/trade/[slug]">) 
         {related.length > 0 && (
           <section className="flex flex-col gap-8">
             <SectionIntro eyebrow="Related trades" title={category ? `More in ${category.name}` : "Related trades"} />
-            <TradeGrid trades={related} />
+            <TradeGrid trades={related} counts={counts} />
           </section>
         )}
       </Container>
-    </>
+      </div>
+    </PageTransition>
   );
 }

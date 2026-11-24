@@ -12,7 +12,7 @@ import { popularTradeGroups, popularTrades } from "../data/homepage-content";
 import type { DestinationRow, GlobeData, HomepageStats, PopularTradeCardData } from "../types/homepage";
 
 /** Where every route on the hero globe starts. */
-const ORIGIN = { label: "Dhaka", code: "BD", lat: 23.81, lng: 90.41 };
+const ORIGIN = { label: "Bangladesh", city: "Dhaka", code: "BD", lat: 23.81, lng: 90.41 };
 
 /** Great-circle distance in km (haversine). */
 function distanceFromOrigin(lat: number, lng: number): number {
@@ -79,7 +79,7 @@ export async function getHomepageData(): Promise<HomepageData> {
     })),
     globe: {
       origin: ORIGIN,
-      destinations: countries.map((c) => ({ label: c.name === "United Arab Emirates" ? "UAE" : c.name, code: c.isoCode, ...c.coordinates })),
+      destinations: countries.map((c) => ({ label: c.name === "United Arab Emirates" ? "UAE" : c.name, city: c.capital, code: c.isoCode, ...c.coordinates })),
     },
   };
 }

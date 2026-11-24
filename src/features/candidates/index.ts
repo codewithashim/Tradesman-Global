@@ -24,3 +24,4 @@ export { CandidateCard } from "./components/candidate-card";
 export { ExperienceMeter } from "./components/experience-meter";
 export { CandidateDirectory } from "./components/candidate-directory";
 export { CandidateDirectorySkeleton } from "./components/candidate-directory-skeleton";
+export { CandidateDirectoryHero } from "./components/candidate-directory-hero";

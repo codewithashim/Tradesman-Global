@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 
 export interface GlobePoint {
+  /** Country name (screen-reader text). */
   label: string;
-  /** Short code drawn next to the marker. */
+  /** ISO code, used as a stable key. */
   code: string;
+  /** City drawn on the label when the route is highlighted. */
+  city: string;
   lat: number;
   lng: number;
 }
@@ -20,33 +23,23 @@ interface RouteGlobeProps {
 type Vec3 = [number, number, number];
 
 const DEG = Math.PI / 180;
-/** View centre sits between Lisbon and Singapore so every route is on the visible face. */
+/** View centre between Lisbon and Singapore, so every route sits on the visible face. */
 const CENTER_LNG = 52;
-const CENTER_LAT = 26;
-/** Idle sway (degrees) instead of a full spin, so routes never rotate out of view. */
-const SWAY = 16;
-/** Label placement for markers that sit close together (Gulf states). */
-const LABEL_SIDE: Record<string, [number, number]> = {
-  SA: [-1, 0.2],
-  QA: [1, -0.9],
-  AE: [1, 0.9],
-  MY: [-1, 0.4],
-  SG: [1, 0.8],
-  PT: [-1, 0.2],
-  IT: [0, 1.6],
-  RO: [1, -0.7],
-};
+const CENTER_LAT = 24;
+const SWAY = 7;
+const CYCLE_MS = 3600;
 
 function toVec(lat: number, lng: number): Vec3 {
   return [Math.cos(lat * DEG) * Math.cos(lng * DEG), Math.cos(lat * DEG) * Math.sin(lng * DEG), Math.sin(lat * DEG)];
 }
 
-/** Great-circle path from a to b, lifted off the surface into an arc. */
-function arcPath(a: Vec3, b: Vec3, steps = 64): Vec3[] {
+
+/** Great-circle path from a to b, lifted off the surface in proportion to its length. */
+function arcPath(a: Vec3, b: Vec3, steps = 72): Vec3[] {
   const dot = Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]));
   const omega = Math.acos(dot);
   const sinO = Math.sin(omega) || 1;
-  const lift = 0.06 + omega * 0.16;
+  const lift = 0.04 + omega * 0.12;
   const out: Vec3[] = [];
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
@@ -58,14 +51,49 @@ function arcPath(a: Vec3, b: Vec3, steps = 64): Vec3[] {
   return out;
 }
 
+/** Graticule rings (every 30°) as point lists, drawn faintly for structure. */
+function graticule(): Vec3[][] {
+  const lines: Vec3[][] = [];
+  for (let lat = -60; lat <= 60; lat += 30) {
+    const ring: Vec3[] = [];
+    for (let lng = -180; lng <= 180; lng += 4) ring.push(toVec(lat, lng));
+    lines.push(ring);
+  }
+  for (let lng = -180; lng < 180; lng += 30) {
+    const ring: Vec3[] = [];
+    for (let lat = -84; lat <= 84; lat += 4) ring.push(toVec(lat, lng));
+    lines.push(ring);
+  }
+  return lines;
+}
+
 /**
- * Dotted globe with animated routes from Bangladesh to each destination.
- * Real orthographic projection on a 2D canvas: no WebGL context, no 3D library,
- * pauses off-screen, draws one static frame for reduced motion.
+ * Dotted globe (real coastlines, 1:50m) with routes from Bangladesh.
+ * One route is highlighted at a time: it draws in, a light travels along it,
+ * and its city is labelled. Orthographic projection on a 2D canvas: no
+ * WebGL, pauses off-screen, static for reduced motion.
  */
 export function RouteGlobe({ origin, destinations, className }: RouteGlobeProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
+  const switchedAt = useRef(0);
+  /** Lets route changes repaint when the loop isn't running (reduced motion, off-screen). */
+  const redrawRef = useRef<(() => void) | null>(null);
+
+  // Cycle the highlighted route (static for reduced motion).
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = window.setInterval(() => setActive((i) => (i + 1) % destinations.length), CYCLE_MS);
+    return () => window.clearInterval(id);
+  }, [destinations.length]);
+
+  useEffect(() => {
+    activeRef.current = active;
+    switchedAt.current = performance.now();
+    redrawRef.current?.();
+  }, [active]);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -75,6 +103,7 @@ export function RouteGlobe({ origin, destinations, className }: RouteGlobeProps)
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const grid = graticule();
     let land: Vec3[] = [];
     let width = 0;
     let frame = 0;
@@ -82,20 +111,25 @@ export function RouteGlobe({ origin, destinations, className }: RouteGlobeProps)
     let visible = true;
     const start = performance.now();
 
-    // Drag-to-turn state (degrees added to the idle sway).
     let dragOffset = 0;
     let dragVelocity = 0;
     let dragging = false;
     let lastX = 0;
 
+    // Pre-rendered soft dot: far cheaper than arc() for thousands of points.
+    const sprite = document.createElement("canvas");
+    const S = Math.ceil(4 * dpr);
+    sprite.width = sprite.height = S;
+    const sctx = sprite.getContext("2d")!;
+    const g = sctx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+    g.addColorStop(0, "rgba(191,219,254,1)");
+    g.addColorStop(0.55, "rgba(147,197,253,0.9)");
+    g.addColorStop(1, "rgba(147,197,253,0)");
+    sctx.fillStyle = g;
+    sctx.fillRect(0, 0, S, S);
+
     const originVec = toVec(origin.lat, origin.lng);
-    const routes = destinations.map((d, i) => ({
-      point: d,
-      vec: toVec(d.lat, d.lng),
-      path: arcPath(originVec, toVec(d.lat, d.lng)),
-      delay: 0.25 + i * 0.12,
-      speed: 0.16 + (i % 3) * 0.03,
-    }));
+    const routes = destinations.map((d) => ({ vec: toVec(d.lat, d.lng), path: arcPath(originVec, toVec(d.lat, d.lng)) }));
 
     function resize() {
       width = wrap!.clientWidth;
@@ -106,21 +140,39 @@ export function RouteGlobe({ origin, destinations, className }: RouteGlobeProps)
       if (!running) draw(performance.now());
     }
 
+    /** Label pill beside an anchor; flips to the left if it would leave the canvas. */
+    function pill(text: string, ax: number, y: number, emphasis: boolean, gap: number) {
+      ctx!.font = `600 ${11 * dpr}px ui-sans-serif, system-ui, sans-serif`;
+      const w = ctx!.measureText(text).width + 14 * dpr;
+      const h = 20 * dpr;
+      const x = ax + gap + w > width * dpr - 6 * dpr ? ax - gap - w : ax + gap;
+      ctx!.fillStyle = emphasis ? "rgba(255,255,255,0.95)" : "rgba(7,29,53,0.75)";
+      ctx!.strokeStyle = emphasis ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.25)";
+      ctx!.lineWidth = 1 * dpr;
+      ctx!.beginPath();
+      ctx!.roundRect(x, y - h / 2, w, h, h / 2);
+      ctx!.fill();
+      ctx!.stroke();
+      ctx!.fillStyle = emphasis ? "#102a43" : "#ffffff";
+      ctx!.textAlign = "left";
+      ctx!.textBaseline = "middle";
+      ctx!.fillText(text, x + 7 * dpr, y + 0.5 * dpr);
+    }
+
     function draw(now: number) {
-      // rAF timestamps can precede `start` by a frame; clamp so radii never go negative.
       const t = Math.max(0, (now - start) / 1000);
       const size = width * dpr;
-      const R = size * 0.44;
+      // Halo stays inside the canvas (R × 1.22 < size / 2), so no square edge.
+      const R = size * 0.4;
       const cx = size / 2;
       const cy = size / 2;
-      const lng0 = (CENTER_LNG + (reduced ? 0 : Math.sin(t * 0.12) * SWAY) + dragOffset) * DEG;
+      const lng0 = (CENTER_LNG + (reduced ? 0 : Math.sin(t * 0.1) * SWAY) + dragOffset) * DEG;
       const lat0 = CENTER_LAT * DEG;
       const cosL = Math.cos(-lng0);
       const sinL = Math.sin(-lng0);
       const cosP = Math.cos(lat0);
       const sinP = Math.sin(lat0);
 
-      // Returns [screenX, screenY, depth]; depth > 0 faces the viewer.
       const project = (v: Vec3): [number, number, number] => {
         const x1 = v[0] * cosL - v[1] * sinL;
         const y1 = v[0] * sinL + v[1] * cosL;
@@ -131,126 +183,171 @@ export function RouteGlobe({ origin, destinations, className }: RouteGlobeProps)
 
       ctx!.clearRect(0, 0, size, size);
 
-      // Atmosphere + sphere body.
-      const halo = ctx!.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 1.25);
-      halo.addColorStop(0, "rgba(59,130,246,0.28)");
+      // Atmosphere.
+      const halo = ctx!.createRadialGradient(cx, cy, R * 0.92, cx, cy, R * 1.22);
+      halo.addColorStop(0, "rgba(59,130,246,0.35)");
+      halo.addColorStop(0.45, "rgba(59,130,246,0.1)");
       halo.addColorStop(1, "rgba(59,130,246,0)");
       ctx!.fillStyle = halo;
       ctx!.beginPath();
-      ctx!.arc(cx, cy, R * 1.25, 0, Math.PI * 2);
+      ctx!.arc(cx, cy, R * 1.22, 0, Math.PI * 2);
       ctx!.fill();
 
-      const body = ctx!.createRadialGradient(cx - R * 0.35, cy - R * 0.45, R * 0.1, cx, cy, R);
-      body.addColorStop(0, "#17406b");
-      body.addColorStop(0.65, "#0b2748");
-      body.addColorStop(1, "#071d35");
+      // Sphere, lit from the upper left.
+      const body = ctx!.createRadialGradient(cx - R * 0.4, cy - R * 0.45, R * 0.05, cx, cy, R);
+      body.addColorStop(0, "#1b4a7d");
+      body.addColorStop(0.55, "#0d2c50");
+      body.addColorStop(1, "#06182d");
       ctx!.fillStyle = body;
       ctx!.beginPath();
       ctx!.arc(cx, cy, R, 0, Math.PI * 2);
       ctx!.fill();
-      ctx!.strokeStyle = "rgba(147,197,253,0.35)";
-      ctx!.lineWidth = 1 * dpr;
-      ctx!.stroke();
 
-      // Land dots, brighter toward the viewer.
-      const dot = 1.15 * dpr;
+      // Graticule.
+      ctx!.strokeStyle = "rgba(147,197,253,0.07)";
+      ctx!.lineWidth = 1 * dpr;
+      for (const ring of grid) {
+        ctx!.beginPath();
+        let pen = false;
+        for (const v of ring) {
+          const [x, y, d] = project(v);
+          if (d <= 0) {
+            pen = false;
+            continue;
+          }
+          if (pen) ctx!.lineTo(x, y);
+          else ctx!.moveTo(x, y);
+          pen = true;
+        }
+        ctx!.stroke();
+      }
+
+      // Land, brighter toward the viewer and slightly larger at the centre.
       for (const v of land) {
-        const [sx, sy, depth] = project(v);
-        if (depth <= 0.02) continue;
-        ctx!.globalAlpha = 0.18 + depth * 0.62;
-        ctx!.fillStyle = "#bfdbfe";
-        ctx!.fillRect(sx - dot / 2, sy - dot / 2, dot, dot);
+        const [x, y, d] = project(v);
+        if (d <= 0.04) continue;
+        const s = S * (0.55 + d * 0.45);
+        ctx!.globalAlpha = 0.12 + d * 0.75;
+        ctx!.drawImage(sprite, x - s / 2, y - s / 2, s, s);
       }
       ctx!.globalAlpha = 1;
 
-      // Routes.
-      for (const route of routes) {
-        const progress = reduced ? 1 : Math.min(1, Math.max(0, (t - route.delay) / 1.4));
-        if (progress <= 0) continue;
-        const pts = route.path.map(project);
-        const last = Math.floor(progress * (pts.length - 1));
+      // Rim light.
+      const rim = ctx!.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
+      rim.addColorStop(0, "rgba(191,219,254,0.55)");
+      rim.addColorStop(0.5, "rgba(147,197,253,0.12)");
+      rim.addColorStop(1, "rgba(147,197,253,0.3)");
+      ctx!.strokeStyle = rim;
+      ctx!.lineWidth = 1.2 * dpr;
+      ctx!.beginPath();
+      ctx!.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx!.stroke();
 
-        ctx!.lineWidth = 1.4 * dpr;
+      const activeIndex = activeRef.current;
+      const sinceSwitch = reduced ? 99 : (now - switchedAt.current) / 1000;
+
+      // Quiet routes first, the highlighted one on top.
+      const order = routes.map((_, i) => i).filter((i) => i !== activeIndex);
+      order.push(activeIndex);
+      for (const i of order) {
+        const route = routes[i];
+        const isActive = i === activeIndex;
+        const pts = route.path.map(project);
+        const progress = isActive ? Math.min(1, sinceSwitch / 1.1) : 1;
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const last = Math.max(1, Math.floor(eased * (pts.length - 1)));
+
         ctx!.lineCap = "round";
-        for (let i = 1; i <= last; i++) {
-          const [x0, y0, d0] = pts[i - 1];
-          const [x1, y1, d1] = pts[i];
-          if (d0 < -0.15 && d1 < -0.15) continue;
-          ctx!.strokeStyle = `rgba(96,165,250,${d1 > 0 ? 0.75 : 0.25})`;
+        for (let k = 1; k <= last; k++) {
+          const [x0, y0, d0] = pts[k - 1];
+          const [x1, y1, d1] = pts[k];
+          if (d0 < -0.1 && d1 < -0.1) continue;
+          if (isActive) {
+            // Emerald at home, brand blue at the destination.
+            const f = k / (pts.length - 1);
+            ctx!.strokeStyle = `rgba(${Math.round(16 + 80 * f)},${Math.round(185 - 20 * f)},${Math.round(129 + 121 * f)},0.95)`;
+            ctx!.lineWidth = 2.4 * dpr;
+          } else {
+            ctx!.strokeStyle = "rgba(147,197,253,0.22)";
+            ctx!.lineWidth = 1 * dpr;
+          }
           ctx!.beginPath();
           ctx!.moveTo(x0, y0);
           ctx!.lineTo(x1, y1);
           ctx!.stroke();
         }
 
-        // Travelling pulse once the route has drawn in.
-        if (!reduced && progress >= 1) {
-          const phase = ((t - route.delay) * route.speed) % 1;
+        // Travelling light on the highlighted route.
+        if (isActive && progress >= 1 && !reduced) {
+          const phase = ((sinceSwitch - 1.1) * 0.55) % 1;
           const head = Math.floor(phase * (pts.length - 1));
-          for (let k = 0; k < 8; k++) {
+          for (let k = 0; k < 10; k++) {
             const p = pts[head - k];
             if (!p || p[2] < 0) continue;
-            ctx!.globalAlpha = (1 - k / 8) * 0.9;
+            ctx!.globalAlpha = (1 - k / 10) * 0.95;
             ctx!.fillStyle = "#ffffff";
             ctx!.beginPath();
-            ctx!.arc(p[0], p[1], (2.2 - k * 0.2) * dpr, 0, Math.PI * 2);
+            ctx!.arc(p[0], p[1], (2.4 - k * 0.18) * dpr, 0, Math.PI * 2);
             ctx!.fill();
           }
           ctx!.globalAlpha = 1;
         }
 
-        // Destination marker + label.
+        // Marker.
         const [mx, my, md] = project(route.vec);
-        if (md > 0 && progress >= 1) {
+        if (md <= 0) continue;
+        if (isActive) {
+          if (progress >= 1) {
+            const ring = reduced ? 0.5 : (sinceSwitch * 0.8) % 1;
+            ctx!.strokeStyle = `rgba(96,165,250,${1 - ring})`;
+            ctx!.lineWidth = 1.5 * dpr;
+            ctx!.beginPath();
+            ctx!.arc(mx, my, (4 + ring * 14) * dpr, 0, Math.PI * 2);
+            ctx!.stroke();
+            pill(destinations[i].city, mx, my - 14 * dpr, true, 10 * dpr);
+          }
           ctx!.fillStyle = "#3b82f6";
           ctx!.beginPath();
-          ctx!.arc(mx, my, 3.4 * dpr, 0, Math.PI * 2);
+          ctx!.arc(mx, my, 4.2 * dpr, 0, Math.PI * 2);
           ctx!.fill();
           ctx!.strokeStyle = "#ffffff";
-          ctx!.lineWidth = 1.2 * dpr;
+          ctx!.lineWidth = 1.6 * dpr;
           ctx!.stroke();
-
-          const [sideX, sideY] = LABEL_SIDE[route.point.code] ?? [1, 0];
-          ctx!.font = `600 ${10.5 * dpr}px ui-sans-serif, system-ui, sans-serif`;
-          ctx!.textAlign = sideX < 0 ? "right" : sideX > 0 ? "left" : "center";
-          ctx!.textBaseline = "middle";
-          ctx!.fillStyle = "rgba(255,255,255,0.85)";
-          ctx!.fillText(route.point.label, mx + sideX * 8 * dpr, my + sideY * 9 * dpr);
+        } else {
+          ctx!.fillStyle = "rgba(147,197,253,0.75)";
+          ctx!.beginPath();
+          ctx!.arc(mx, my, 2.4 * dpr, 0, Math.PI * 2);
+          ctx!.fill();
         }
       }
 
-      // Origin: Bangladesh, with a slow emerald pulse.
+      // Origin: Dhaka.
       const [ox, oy] = project(originVec);
-      const pulse = reduced ? 0.5 : (t * 0.6) % 1;
-      ctx!.strokeStyle = `rgba(16,185,129,${1 - pulse})`;
+      const pulse = reduced ? 0.5 : (t * 0.55) % 1;
+      ctx!.strokeStyle = `rgba(16,185,129,${0.9 * (1 - pulse)})`;
       ctx!.lineWidth = 1.5 * dpr;
       ctx!.beginPath();
-      ctx!.arc(ox, oy, (5 + pulse * 16) * dpr, 0, Math.PI * 2);
+      ctx!.arc(ox, oy, (5 + pulse * 18) * dpr, 0, Math.PI * 2);
       ctx!.stroke();
       ctx!.fillStyle = "#10b981";
       ctx!.beginPath();
-      ctx!.arc(ox, oy, 4.6 * dpr, 0, Math.PI * 2);
+      ctx!.arc(ox, oy, 5 * dpr, 0, Math.PI * 2);
       ctx!.fill();
       ctx!.strokeStyle = "#ffffff";
-      ctx!.lineWidth = 1.6 * dpr;
+      ctx!.lineWidth = 1.8 * dpr;
       ctx!.stroke();
-      ctx!.font = `700 ${11.5 * dpr}px ui-sans-serif, system-ui, sans-serif`;
-      ctx!.textAlign = "left";
-      ctx!.fillStyle = "#ffffff";
-      ctx!.fillText(origin.label, ox + 10 * dpr, oy + 12 * dpr);
+      pill(origin.city, ox, oy - 16 * dpr, false, 11 * dpr);
     }
 
     function loop(now: number) {
       if (!dragging) {
         dragOffset += dragVelocity;
         dragVelocity *= 0.94;
-        // Ease back toward the composed view.
         dragOffset *= 0.985;
       }
       draw(now);
       frame = requestAnimationFrame(loop);
     }
-
     function startLoop() {
       if (running || reduced || !visible || document.hidden) return;
       running = true;
@@ -261,7 +358,6 @@ export function RouteGlobe({ origin, destinations, className }: RouteGlobeProps)
       cancelAnimationFrame(frame);
     }
 
-    // Pointer drag (horizontal only, so vertical page scrolling still works on touch).
     function onDown(e: PointerEvent) {
       dragging = true;
       lastX = e.clientX;
@@ -287,6 +383,9 @@ export function RouteGlobe({ origin, destinations, className }: RouteGlobeProps)
     });
     const ro = new ResizeObserver(resize);
     const onVisibility = () => (document.hidden ? stopLoop() : startLoop());
+    redrawRef.current = () => {
+      if (!running) draw(performance.now());
+    };
 
     let cancelled = false;
     fetch("/data/globe-land.json")
@@ -299,7 +398,7 @@ export function RouteGlobe({ origin, destinations, className }: RouteGlobeProps)
         if (!running) draw(performance.now());
       })
       .catch(() => {
-        /* Globe still renders routes without land dots. */
+        /* The globe still renders routes without land. */
       });
 
     ro.observe(wrap);
@@ -314,6 +413,7 @@ export function RouteGlobe({ origin, destinations, className }: RouteGlobeProps)
 
     return () => {
       cancelled = true;
+      redrawRef.current = null;
       stopLoop();
       ro.disconnect();
       io.disconnect();
@@ -326,8 +426,10 @@ export function RouteGlobe({ origin, destinations, className }: RouteGlobeProps)
   }, [origin, destinations]);
 
   return (
-    <div ref={wrapRef} className={cn("relative aspect-square w-full", className)}>
-      <canvas ref={canvasRef} aria-hidden className="absolute inset-0 cursor-grab touch-pan-y active:cursor-grabbing" />
+    <div className={cn("relative", className)}>
+      <div ref={wrapRef} className="relative aspect-square w-full">
+        <canvas ref={canvasRef} aria-hidden className="absolute inset-0 cursor-grab touch-pan-y active:cursor-grabbing" />
+      </div>
     </div>
   );
 }

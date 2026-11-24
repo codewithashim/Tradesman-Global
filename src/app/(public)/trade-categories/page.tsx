@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
+import { PageTransition } from "@/components/animations";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
-import { PageIntro } from "@/components/shared/page-intro";
-import { TradeCategoryDirectory, getTradeCategoriesWithTrades } from "@/features/trades";
+import { getCandidateCountsByTrade } from "@/features/candidates";
+import { TradeCategoryDirectory, TradesHero, getTradeCategoriesWithTrades } from "@/features/trades";
 import { routes } from "@/lib/constants/routes";
 
 export const metadata: Metadata = {
@@ -11,21 +12,25 @@ export const metadata: Metadata = {
 };
 
 export default async function TradeCategoriesPage() {
-  const categories = await getTradeCategoriesWithTrades();
+  const [categories, counts] = await Promise.all([getTradeCategoriesWithTrades(), getCandidateCountsByTrade()]);
   const tradeCount = categories.reduce((total, category) => total + category.trades.length, 0);
+  const profileCount = Object.values(counts).reduce((a, b) => a + b, 0);
 
   return (
-    <>
-      <PageIntro
-        breadcrumbs={<Breadcrumbs items={[{ label: "Home", href: routes.home }, { label: "Trades" }]} />}
-        eyebrow={`${tradeCount} trades · ${categories.length} categories`}
-        title="Find workers"
-        highlight="by trade."
-        description="Every worker lists a primary trade. Pick one to see the skills and certificates employers look for — and where those workers are in demand."
-      />
-      <Container className="-mt-14 pb-16 sm:-mt-16 sm:pb-24">
-        <TradeCategoryDirectory categories={categories} />
-      </Container>
-    </>
+    <PageTransition>
+      <div>
+        <TradesHero
+          breadcrumbs={<Breadcrumbs tone="light" items={[{ label: "Home", href: routes.home }, { label: "Trades" }]} />}
+          stats={[
+            { value: tradeCount, label: "trades" },
+            { value: categories.length, label: "categories" },
+            { value: profileCount, label: "reviewed profiles" },
+          ]}
+        />
+        <Container className="pb-20 pt-8 sm:pb-28 sm:pt-10">
+          <TradeCategoryDirectory categories={categories} counts={counts} />
+        </Container>
+      </div>
+    </PageTransition>
   );
 }

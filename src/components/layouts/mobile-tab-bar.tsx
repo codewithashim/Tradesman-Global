@@ -144,9 +144,6 @@ function MoreSheet({ nav, open, onOpenChange }: { nav: SiteNavData; open: boolea
           >
             <span aria-hidden className="absolute -right-10 -top-10 size-36 rounded-full bg-white/10" />
             <span className="relative block text-lg font-bold">Create your free profile</span>
-            <span lang="bn" className="relative mt-1 block text-sm text-white/80">
-              বিনামূল্যে প্রোফাইল তৈরি করুন
-            </span>
             <span className="relative mt-4 inline-flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-semibold text-navy">
               Get started <ChevronRight aria-hidden className="size-4" />
             </span>

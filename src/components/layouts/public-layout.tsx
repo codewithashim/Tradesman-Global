@@ -15,7 +15,7 @@ interface PublicLayoutProps {
 export function PublicLayout({ children, nav = emptyNav }: PublicLayoutProps) {
   return (
     <>
-      <SiteHeader nav={nav} />
+      <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter nav={nav} />
       <MobileTabBar nav={nav} />

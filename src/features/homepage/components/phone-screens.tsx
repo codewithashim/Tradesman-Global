@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils/cn";
  * active; data-fill bars grow to their width; data-digit cells pop in.
  */
 
-function ScreenHeader({ step, title, bn }: { step: number; title: string; bn: string }) {
+function ScreenHeader({ step, title }: { step: number; title: string }) {
   return (
     <div data-ui>
       <div className="flex items-center justify-between">
@@ -22,9 +22,6 @@ function ScreenHeader({ step, title, bn }: { step: number; title: string; bn: st
         ))}
       </div>
       <p className="type-display mt-5 text-[1.45rem] text-navy">{title}</p>
-      <p lang="bn" className="mt-0.5 text-[11px] text-muted-foreground">
-        {bn}
-      </p>
     </div>
   );
 }
@@ -32,7 +29,7 @@ function ScreenHeader({ step, title, bn }: { step: number; title: string; bn: st
 export function SignUpScreen() {
   return (
     <div className="flex h-full flex-col">
-      <ScreenHeader step={1} title="Create your profile" bn="আপনার প্রোফাইল তৈরি করুন" />
+      <ScreenHeader step={1} title="Create your profile" />
       <div data-ui className="mt-6">
         <p className="text-[10px] font-medium text-muted-foreground">Mobile number</p>
         <div className="mt-1.5 flex items-center gap-2 rounded-xl bg-background px-3 py-2.5 ring-1 ring-border">
@@ -75,7 +72,7 @@ const tradeTiles: { icon: LucideIcon; label: string }[] = [
 export function SkillsScreen() {
   return (
     <div className="flex h-full flex-col">
-      <ScreenHeader step={2} title="What’s your trade?" bn="আপনার পেশা নির্বাচন করুন" />
+      <ScreenHeader step={2} title="What’s your trade?" />
       <div className="mt-5 grid grid-cols-3 gap-2">
         {tradeTiles.map(({ icon: Icon, label }, i) => (
           <span
@@ -122,7 +119,7 @@ export function VideoScreen() {
   const thumbs = [siteImages.welding, siteImages.masonry, siteImages.electrical];
   return (
     <div className="flex h-full flex-col">
-      <ScreenHeader step={3} title="Show your work" bn="ভিডিও ও কাজের ছবি যোগ করুন" />
+      <ScreenHeader step={3} title="Show your work" />
       <div data-ui className="relative mt-5 aspect-[4/3] overflow-hidden rounded-2xl">
         <Image src={siteImages.videoResume.src} alt="" fill sizes="260px" className="object-cover" />
         <span className="absolute left-2.5 top-2.5 flex items-center gap-1 rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-semibold text-white backdrop-blur">
@@ -165,7 +162,7 @@ export function ReviewScreen() {
   ];
   return (
     <div className="flex h-full flex-col">
-      <ScreenHeader step={4} title="You’re live" bn="আপনার প্রোফাইল এখন দৃশ্যমান" />
+      <ScreenHeader step={4} title="You’re live" />
       <div data-ui className="mt-5 flex items-center gap-3 rounded-2xl bg-navy p-3 text-white">
         <span className="grid size-11 place-items-center rounded-xl bg-linear-to-br from-brand-blue to-primary text-sm font-bold">YP</span>
         <span className="min-w-0 flex-1">

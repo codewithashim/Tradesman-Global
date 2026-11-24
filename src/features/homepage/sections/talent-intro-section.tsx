@@ -47,9 +47,6 @@ export function TalentIntroSection({ stats }: { stats: HomepageStats }) {
               <p className="text-base font-semibold leading-snug sm:text-lg">
                 Every profile is checked by our team before employers can see it.
               </p>
-              <p lang="bn" className="text-sm text-white/60">
-                প্রতিটি প্রোফাইল প্রকাশের আগে যাচাই করা হয়।
-              </p>
             </div>
           </div>
         </div>

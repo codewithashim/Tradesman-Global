@@ -20,9 +20,6 @@ export function FinalCtaSection() {
         <div className="mt-10 flex w-full flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-md">
             <p className="text-lg leading-8 text-white/70">Build your worker profile today. It’s free, and it’s yours.</p>
-            <p lang="bn" className="mt-1 text-white/50">
-              আজই আপনার ফ্রি প্রোফাইল তৈরি করুন।
-            </p>
           </div>
           <Magnetic>
             <ButtonLink href={routes.register} size="lg" variant="secondary" className="h-16 w-full bg-white px-9 text-lg text-navy ring-0 hover:bg-sky sm:w-auto">

@@ -9,6 +9,7 @@ export {
   getCountriesHiringTrade,
 } from "./services/country-service";
 
+export { CountryFlag } from "./components/country-flag";
 export { CountryCard } from "./components/country-card";
 export { CountryGrid } from "./components/country-grid";
 export { CountryDetail, CountryHero } from "./components/country-detail";

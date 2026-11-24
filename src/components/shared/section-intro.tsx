@@ -3,9 +3,8 @@ import { cn } from "@/lib/utils/cn";
 
 interface SectionIntroProps {
   eyebrow?: string;
-  /** Rendered in navy… */
   title: string;
-  /** …followed by this part in brand blue. */
+  /** Continues the title (kept separate so callers can break long headings). */
   highlight?: string;
   description?: ReactNode;
   align?: "left" | "center";
@@ -15,7 +14,7 @@ interface SectionIntroProps {
   className?: string;
 }
 
-/** Eyebrow pill + two-tone heading, the brand's standard section opener. */
+/** Small context label + display heading, the brand's standard section opener. */
 export function SectionIntro({
   eyebrow,
   title,
@@ -40,18 +39,18 @@ export function SectionIntro({
         {eyebrow && (
           <span
             className={cn(
-              "mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em]",
-              tone === "dark" ? "bg-card text-primary shadow-soft ring-1 ring-border" : "bg-white/10 text-brand-blue ring-1 ring-white/15",
+              "mb-4 inline-flex items-center gap-2.5 text-sm font-semibold",
+              tone === "dark" ? "text-primary" : "text-brand-blue",
             )}
           >
-            <span aria-hidden className="size-1.5 rounded-full bg-current" />
+            <span aria-hidden className="h-px w-6 bg-current" />
             {eyebrow}
           </span>
         )}
         <Heading
           className={cn(
-            "font-extrabold tracking-tight text-balance",
-            Heading === "h1" ? "text-4xl sm:text-5xl" : "text-3xl sm:text-4xl",
+            "type-display text-balance",
+            Heading === "h1" ? "text-[2.75rem] sm:text-6xl" : "text-[2.4rem] sm:text-5xl lg:text-6xl",
             tone === "dark" ? "text-navy" : "text-white",
           )}
         >
@@ -59,7 +58,7 @@ export function SectionIntro({
           {highlight && (
             <>
               {" "}
-              <span className="text-primary">{highlight}</span>
+              <span>{highlight}</span>
             </>
           )}
         </Heading>

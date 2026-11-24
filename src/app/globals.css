@@ -11,7 +11,7 @@
 :root {
   --radius: 1rem;
 
-  --background: #f7fafe;
+  --background: #f5f8fc;
   --foreground: #102a43;
   --card: #ffffff;
   --card-foreground: #102a43;
@@ -74,11 +74,14 @@
   --radius-3xl: calc(var(--radius) + 16px);
 
   --font-sans: var(--font-jakarta), var(--font-noto-bengali), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-noto-bengali), var(--font-jakarta), sans-serif;
   --font-bengali: var(--font-noto-bengali), var(--font-jakarta), sans-serif;
 
   /* Soft, layered elevation used across cards (reference: floating UI). */
   --shadow-soft: 0 1px 2px rgb(16 42 67 / 0.04), 0 8px 24px -6px rgb(16 42 67 / 0.08);
   --shadow-float: 0 2px 6px rgb(16 42 67 / 0.05), 0 24px 48px -12px rgb(37 99 235 / 0.18);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
   --animate-float: float 7s ease-in-out infinite;
   --animate-marquee: marquee 40s linear infinite;
@@ -134,7 +137,56 @@
     linear-gradient(180deg, #eaf4ff 0%, #f7fafe 100%);
 }
 
+@keyframes grow-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Display type: tight, confident headlines. */
+@utility type-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  font-variation-settings: "wdth" 90;
+}
+
+/* Hide GSAP-driven elements until their timeline starts, so there is no flash.
+   Without JS (or with reduced motion) the [data-anim] content stays visible. */
+.js-anim [data-anim="hide"] {
+  visibility: hidden;
+  /* Failsafe: if scripts never run, show the content anyway. */
+  animation: anim-failsafe 0s 3s forwards;
+}
+@keyframes anim-failsafe {
+  to { visibility: visible; }
+}
+
+/* Page transitions (React <ViewTransition>). Old page leaves fast, new page rises in. */
+::view-transition-old(.page) {
+  animation: 160ms ease-in both vt-fade reverse;
+}
+::view-transition-new(.page) {
+  animation:
+    260ms ease-out 120ms both vt-fade,
+    420ms var(--ease-out-expo, ease-out) both vt-rise;
+}
+@keyframes vt-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes vt-rise {
+  from { transform: translateY(14px); }
+  to { transform: translateY(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
   *,
   *::before,
   *::after {

@@ -5,12 +5,23 @@ import {
   getFeaturedCandidates,
   type Candidate,
 } from "@/features/candidates";
-import { getCountries, type Country } from "@/features/countries";
+import { getCountries } from "@/features/countries";
 import { getTrades } from "@/features/trades";
 import type { Option } from "@/types/common";
 import { popularTradeGroups, popularTrades } from "../data/homepage-content";
-import type { PopularTradeCardData } from "../sections/popular-trades-section";
-import type { HomepageStats } from "../types/homepage";
+import type { DestinationRow, GlobeData, HomepageStats, PopularTradeCardData } from "../types/homepage";
+
+/** Where every route on the hero globe starts. */
+const ORIGIN = { label: "Dhaka", code: "BD", lat: 23.81, lng: 90.41 };
+
+/** Great-circle distance in km (haversine). */
+function distanceFromOrigin(lat: number, lng: number): number {
+  const rad = Math.PI / 180;
+  const dLat = (lat - ORIGIN.lat) * rad;
+  const dLng = (lng - ORIGIN.lng) * rad;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(ORIGIN.lat * rad) * Math.cos(lat * rad) * Math.sin(dLng / 2) ** 2;
+  return Math.round((6371 * 2 * Math.asin(Math.sqrt(a))) / 10) * 10;
+}
 
 /*
  * The homepage is a composition feature: it reads other features through their
@@ -24,7 +35,8 @@ export interface HomepageData {
   experienceOptions: Option[];
   popularTrades: PopularTradeCardData[];
   featuredWorkers: Candidate[];
-  destinations: Country[];
+  destinations: DestinationRow[];
+  globe: GlobeData;
 }
 
 export async function getHomepageData(): Promise<HomepageData> {
@@ -54,6 +66,20 @@ export async function getHomepageData(): Promise<HomepageData> {
       ),
     })),
     featuredWorkers: featured,
-    destinations: countries,
+    destinations: countries.map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      isoCode: c.isoCode,
+      region: c.region,
+      capital: c.capital,
+      currency: c.currency,
+      summary: c.summary,
+      sectors: c.keySectors.slice(0, 3),
+      distanceKm: distanceFromOrigin(c.coordinates.lat, c.coordinates.lng),
+    })),
+    globe: {
+      origin: ORIGIN,
+      destinations: countries.map((c) => ({ label: c.name === "United Arab Emirates" ? "UAE" : c.name, code: c.isoCode, ...c.coordinates })),
+    },
   };
 }

@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, ChevronDown, Lock, Mail, MapPin, Phone, Sparkles } from "lucide-react";
+import { BadgeCheck, ChevronDown, Lock, Mail, MapPin, Phone, Sparkles } from "lucide-react";
 import { Container } from "@/components/ui/container";
-import { ButtonLink } from "@/components/ui/button-link";
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { SocialIcon } from "@/components/shared/social-icon";
 import { routes } from "@/lib/constants/routes";
@@ -27,33 +26,14 @@ export function SiteFooter({ nav }: { nav: SiteNavData }) {
       <div aria-hidden className="pointer-events-none absolute -left-40 -top-40 size-[36rem] rounded-full bg-primary/25 blur-[120px]" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-4 right-0 select-none text-[clamp(4.5rem,15vw,13rem)] font-extrabold leading-none tracking-tighter text-white/[0.03]"
+        className="type-display pointer-events-none absolute -bottom-3 right-0 select-none text-[clamp(4.5rem,17vw,15rem)] text-white/[0.035]"
       >
         TRADESMAN
       </div>
 
       <Container className="relative">
-        {/* CTA */}
-        <div className="flex flex-col gap-7 border-b border-white/10 py-12 md:flex-row md:items-end md:justify-between md:py-16">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-blue">For skilled workers</p>
-            <h2 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">Get discovered.</h2>
-            <p className="mt-3 max-w-md text-base text-white/70 sm:text-lg">
-              Show your skills, your work and your experience — in one professional profile.
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 md:items-end">
-            <ButtonLink href={routes.register} variant="secondary" size="lg" className="bg-white text-navy ring-0 hover:bg-sky max-md:w-full">
-              Create Free Profile <ArrowRight />
-            </ButtonLink>
-            <p lang="bn" className="text-sm text-white/50 max-md:text-center">
-              সম্পূর্ণ বিনামূল্যে
-            </p>
-          </div>
-        </div>
-
         {/* Trust strip */}
-        <ul className="grid grid-cols-1 gap-3 border-b border-white/10 py-8 sm:grid-cols-3 sm:gap-6">
+        <ul className="grid grid-cols-1 gap-3 border-y border-white/10 py-8 sm:grid-cols-3 sm:gap-6">
           {trustPoints.map(({ icon: Icon, title, text }) => (
             <li key={title} className="flex items-start gap-3 rounded-2xl bg-white/[0.04] p-4 ring-1 ring-white/10 sm:bg-transparent sm:p-0 sm:ring-0">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/20 text-brand-blue">

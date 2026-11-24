@@ -5,12 +5,12 @@ import {
   getFeaturedCandidates,
   type Candidate,
 } from "@/features/candidates";
-import { getCountries } from "@/features/countries";
+import { getCountries, type Country } from "@/features/countries";
 import { getTrades } from "@/features/trades";
 import type { Option } from "@/types/common";
 import { popularTradeGroups, popularTrades } from "../data/homepage-content";
 import type { PopularTradeCardData } from "../sections/popular-trades-section";
-import type { DestinationSummary, HomepageStats } from "../types/homepage";
+import type { HomepageStats } from "../types/homepage";
 
 /*
  * The homepage is a composition feature: it reads other features through their
@@ -24,7 +24,7 @@ export interface HomepageData {
   experienceOptions: Option[];
   popularTrades: PopularTradeCardData[];
   featuredWorkers: Candidate[];
-  destinations: DestinationSummary[];
+  destinations: Country[];
 }
 
 export async function getHomepageData(): Promise<HomepageData> {
@@ -54,13 +54,6 @@ export async function getHomepageData(): Promise<HomepageData> {
       ),
     })),
     featuredWorkers: featured,
-    destinations: countries.map((c) => ({
-      slug: c.slug,
-      name: c.name,
-      isoCode: c.isoCode,
-      region: c.region,
-      summary: c.summary,
-      tradeCount: c.inDemandTradeSlugs.length,
-    })),
+    destinations: countries,
   };
 }

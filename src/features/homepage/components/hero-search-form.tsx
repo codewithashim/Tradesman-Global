@@ -72,7 +72,7 @@ function SearchField({ id, name, label, icon, placeholder, options }: SearchFiel
           id={id}
           name={name}
           defaultValue=""
-          className="-ml-0.5 w-full cursor-pointer appearance-none truncate bg-transparent pr-2 text-[15px] font-semibold text-navy outline-none"
+          className="-ml-0.5 w-full cursor-pointer appearance-none truncate bg-transparent pr-2 text-base font-semibold text-navy outline-none"
         >
           <option value="">{placeholder}</option>
           {options.map((option) => (

@@ -25,7 +25,7 @@ const example = {
 
 export function SkillsShowcaseSection() {
   return (
-    <section className="relative overflow-hidden py-24 sm:py-32">
+    <section className="relative overflow-hidden py-16 sm:py-24 lg:py-32">
       <div aria-hidden className="absolute -right-40 top-10 size-[30rem] rounded-full bg-brand-blue/15 blur-3xl" />
       <Container className="relative grid grid-cols-1 items-center gap-14 lg:grid-cols-[1fr_1.05fr] lg:gap-20">
         {/* Copy */}

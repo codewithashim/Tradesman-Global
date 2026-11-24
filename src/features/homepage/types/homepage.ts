@@ -4,15 +4,6 @@
  * stays independent of their internals.
  */
 
-export interface DestinationSummary {
-  slug: string;
-  name: string;
-  isoCode: string;
-  region: string;
-  summary: string;
-  tradeCount: number;
-}
-
 export interface HomepageStats {
   profiles: number;
   trades: number;

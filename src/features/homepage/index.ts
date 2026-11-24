@@ -1,6 +1,6 @@
 // Public API of the homepage feature. Import from "@/features/homepage" only.
 
-export type { DestinationSummary, HomepageStats } from "./types/homepage";
+export type { HomepageStats } from "./types/homepage";
 export { getHomepageData, type HomepageData } from "./services/homepage-service";
 
 export { HeroSection } from "./sections/hero-section";

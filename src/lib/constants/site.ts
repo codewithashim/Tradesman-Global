@@ -1,5 +1,7 @@
 import { routes } from "./routes";
 
+export type SocialNetwork = "facebook" | "youtube" | "whatsapp" | "tiktok" | "instagram";
+
 export const siteConfig = {
   name: "Tradesman Global",
   tagline: "Skilled Bangladeshi workers, ready for the world.",
@@ -14,11 +16,12 @@ export const siteConfig = {
   },
   /** Social channels. `url: null` renders as "coming soon" until accounts exist. */
   social: [
-    { label: "Facebook", url: null },
-    { label: "YouTube", url: null },
-    { label: "WhatsApp", url: null },
-    { label: "LinkedIn", url: null },
-  ] as { label: string; url: string | null }[],
+    { network: "facebook", label: "Facebook", url: null },
+    { network: "youtube", label: "YouTube", url: null },
+    { network: "whatsapp", label: "WhatsApp", url: null },
+    { network: "tiktok", label: "TikTok", url: null },
+    { network: "instagram", label: "Instagram", url: null },
+  ] as { network: SocialNetwork; label: string; url: string | null }[],
 } as const;
 
 export const mainNav = [

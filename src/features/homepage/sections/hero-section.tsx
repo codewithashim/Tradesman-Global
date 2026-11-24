@@ -12,7 +12,7 @@ export function HeroSection({ destinationCount }: { destinationCount: number }) 
     <section className="px-3 pt-3 sm:px-4">
       <div className="relative overflow-hidden rounded-[2rem] bg-hero-glow sm:rounded-[2.5rem]">
         <div aria-hidden className="absolute inset-0 bg-dot-grid opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-        <Container className="relative grid grid-cols-1 items-center gap-14 pb-32 pt-14 lg:grid-cols-[1.08fr_1fr] lg:gap-10 lg:pb-40 lg:pt-20">
+        <Container className="relative grid grid-cols-1 items-center gap-14 pb-32 pt-10 sm:pt-14 lg:grid-cols-[1.08fr_1fr] lg:gap-10 lg:pb-40 lg:pt-20">
           {/* Copy */}
           <div className="flex flex-col items-start">
             <span className="inline-flex items-center gap-2 rounded-full bg-card/80 py-1 pl-1 pr-3 text-xs font-semibold text-navy shadow-soft ring-1 ring-border backdrop-blur">

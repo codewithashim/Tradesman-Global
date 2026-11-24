@@ -11,4 +11,4 @@ export {
 
 export { CountryCard } from "./components/country-card";
 export { CountryGrid } from "./components/country-grid";
-export { CountryDetail } from "./components/country-detail";
+export { CountryDetail, CountryHero } from "./components/country-detail";

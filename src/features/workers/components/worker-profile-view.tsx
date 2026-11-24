@@ -44,9 +44,9 @@ export function WorkerProfileView({ worker }: { worker: WorkerProfile }) {
       </div>
 
       {/* Mobile: persistent primary action */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-background/90 p-3 backdrop-blur-xl lg:hidden">
+      <div className="fixed inset-x-0 bottom-tabbar-raised z-40 px-3 lg:hidden">
         <ContactAdminDialog workerName={worker.fullName} workerSlug={worker.slug}>
-          <Button size="lg" className="w-full">
+          <Button size="lg" className="w-full shadow-float">
             <MessageSquare /> Contact Admin about {worker.fullName.split(" ").find((p) => !p.endsWith(".")) ?? worker.fullName}
           </Button>
         </ContactAdminDialog>

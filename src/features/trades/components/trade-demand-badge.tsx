@@ -8,9 +8,9 @@ const labels: Record<TradeDemandLevel, string> = {
   steady: "Steady demand",
 };
 
-export function TradeDemandBadge({ demand }: { demand: TradeDemandLevel }) {
+export function TradeDemandBadge({ demand, className }: { demand: TradeDemandLevel; className?: string }) {
   return (
-    <Badge variant={demand === "high" ? "brand" : "outline"}>
+    <Badge variant={demand === "high" ? "brand" : "outline"} className={className}>
       {demand !== "steady" && <TrendingUp aria-hidden className="size-3" />}
       {labels[demand]}
     </Badge>

@@ -20,7 +20,7 @@ export function CandidateSortSelect() {
         id={id}
         value={filters.sort}
         onChange={(event) => updateFilters({ sort: event.target.value as CandidateSort })}
-        className="h-11 cursor-pointer appearance-none rounded-full bg-transparent pl-10 pr-5 text-sm font-semibold text-navy outline-none"
+        className="h-11 cursor-pointer appearance-none rounded-full bg-transparent pl-10 pr-5 text-base font-semibold sm:text-sm text-navy outline-none"
       >
         {sortOptions.map((option) => (
           <option key={option.value} value={option.value}>

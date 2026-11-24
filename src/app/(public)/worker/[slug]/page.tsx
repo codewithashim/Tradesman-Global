@@ -30,7 +30,7 @@ export default async function WorkerPage({ params }: PageProps<"/worker/[slug]">
 
   return (
     // Bottom padding on mobile clears the sticky "Contact Admin" bar.
-    <div className="pb-24 lg:pb-0">
+    <div className="pb-20 lg:pb-0">
       <Container className="flex flex-col gap-6 pb-20 pt-8 sm:pt-10">
         <Breadcrumbs
           items={[

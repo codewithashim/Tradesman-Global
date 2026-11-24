@@ -17,7 +17,7 @@ const chapters = ["Introduction", "Live demonstration", "Tools & safety"];
 export function VideoResumeSection() {
   const image = siteImages.videoResume;
   return (
-    <section className="py-24 sm:py-32">
+    <section className="py-16 sm:py-24 lg:py-32">
       <Container className="grid grid-cols-1 items-center gap-14 lg:grid-cols-2 lg:gap-20">
         {/* Visual: video resume preview composition */}
         <Reveal>

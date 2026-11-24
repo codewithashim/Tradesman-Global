@@ -12,7 +12,7 @@ export function FeaturedWorkersSection({ workers }: { workers: Candidate[] }) {
   if (!spotlight) return null;
 
   return (
-    <section className="relative overflow-hidden bg-sky/60 py-24 sm:py-32">
+    <section className="relative overflow-hidden bg-sky/60 py-16 sm:py-24 lg:py-32">
       <div aria-hidden className="absolute inset-0 bg-dot-grid opacity-70" />
       <Container className="relative flex flex-col gap-12">
         <SectionIntro
@@ -31,9 +31,10 @@ export function FeaturedWorkersSection({ workers }: { workers: Candidate[] }) {
           <Reveal className="h-full">
             <SpotlightWorkerCard worker={spotlight} />
           </Reveal>
-          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          {/* Mobile: swipeable carousel; sm+: 2×2 grid. */}
+          <ul className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0">
             {rest.map((worker, index) => (
-              <li key={worker.id}>
+              <li key={worker.id} className="w-[85%] shrink-0 snap-center sm:w-auto">
                 <Reveal delay={index * 90} className="h-full">
                   <CandidateCard candidate={worker} />
                 </Reveal>

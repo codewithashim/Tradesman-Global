@@ -50,7 +50,7 @@ export function CandidateSearchBar(options: CandidateFilterOptions) {
           placeholder="Search skills, names, certificates…"
           aria-label="Keyword"
           maxLength={100}
-          className="h-14 w-full rounded-full bg-transparent pl-14 pr-4 text-[15px] text-navy outline-none placeholder:text-muted-foreground sm:pr-32"
+          className="h-14 w-full rounded-full bg-transparent pl-14 pr-4 text-base text-navy outline-none placeholder:text-muted-foreground sm:pr-32"
         />
         <Button type="submit" className="absolute right-2 hidden h-10 sm:inline-flex">
           Search

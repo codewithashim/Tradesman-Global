@@ -119,7 +119,7 @@ export function ContactAdminDialog({ workerName, workerSlug, children }: Contact
 }
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-input bg-card px-3.5 text-sm text-navy outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-ring/20";
+  "h-12 w-full rounded-xl border border-input bg-card px-3.5 text-base text-navy sm:h-11 sm:text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-ring/20";
 
 function Field({ id, label, required, children }: { id: string; label: string; required?: boolean; children: ReactNode }) {
   return (

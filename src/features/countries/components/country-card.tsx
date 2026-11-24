@@ -1,31 +1,35 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Plane } from "lucide-react";
 import { routes } from "@/lib/constants/routes";
 import type { Country } from "../types/country";
-import { CountryCodeMark } from "./country-code-mark";
 
+/** Destination card with an oversized ISO-code watermark (flag emoji render inconsistently). */
 export function CountryCard({ country }: { country: Country }) {
   return (
     <Link
       href={routes.country(country.slug)}
-      className="group flex h-full flex-col gap-4 rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      className="group relative flex h-full min-h-52 flex-col overflow-hidden rounded-3xl bg-card p-5 shadow-soft ring-1 ring-border/70 transition duration-300 hover:-translate-y-1 hover:shadow-float focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/60 active:scale-[0.98] sm:p-6"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <CountryCodeMark isoCode={country.isoCode} />
-          <div>
-            <h3 className="font-semibold leading-tight">{country.name}</h3>
-            <p className="text-xs text-muted-foreground">{country.region}</p>
-          </div>
-        </div>
-        <ArrowUpRight
-          aria-hidden
-          className="size-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-foreground"
-        />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -bottom-3 -right-1 select-none text-[4.5rem] font-extrabold leading-none tracking-tighter text-sky/80 transition group-hover:text-primary/10"
+      >
+        {country.isoCode}
+      </span>
+
+      <div className="relative flex items-center justify-between">
+        <span className="rounded-full bg-sky px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary">
+          {country.region}
+        </span>
+        <span className="grid size-9 place-items-center rounded-full bg-navy text-white transition group-hover:rotate-45 group-hover:bg-primary">
+          <ArrowUpRight aria-hidden className="size-4" />
+        </span>
       </div>
-      <p className="flex-1 text-sm leading-6 text-muted-foreground">{country.summary}</p>
-      <p className="text-xs font-medium text-muted-foreground">
-        {country.inDemandTradeSlugs.length} trades in demand
+
+      <h3 className="relative mt-5 text-xl font-bold tracking-tight text-navy">{country.name}</h3>
+      <p className="relative mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{country.summary}</p>
+      <p className="relative mt-auto flex items-center gap-1.5 pt-5 text-sm font-semibold text-navy">
+        <Plane aria-hidden className="size-4 text-primary" /> {country.inDemandTradeSlugs.length} trades in demand
       </p>
     </Link>
   );

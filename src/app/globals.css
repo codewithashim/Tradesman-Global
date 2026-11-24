@@ -113,6 +113,10 @@
 @utility bottom-tabbar {
   bottom: calc(4.5rem + env(safe-area-inset-bottom));
 }
+/* Clears the tab bar *and* its raised centre button. */
+@utility bottom-tabbar-raised {
+  bottom: calc(6.25rem + env(safe-area-inset-bottom));
+}
 @utility pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }

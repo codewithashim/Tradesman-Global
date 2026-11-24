@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, UserPlus } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
-import { SectionHeading } from "@/components/shared/section-heading";
+import { SectionIntro } from "@/components/shared/section-intro";
+import { getCandidateCountsByTrade } from "@/features/candidates";
 import { CountryGrid, getCountriesHiringTrade } from "@/features/countries";
 import {
   TradeDetail,
   TradeGrid,
+  TradeHero,
   getRelatedTrades,
   getTradeBySlug,
   getTradeCategories,
@@ -25,7 +27,7 @@ export async function generateMetadata({ params }: PageProps<"/trade/[slug]">): 
   const { slug } = await params;
   const trade = await getTradeBySlug(slug);
   if (!trade) return {};
-  return { title: `${trade.name}s for overseas hire`, description: trade.summary };
+  return { title: `${trade.name} — skilled Bangladeshi workers`, description: trade.summary };
 }
 
 export default async function TradePage({ params }: PageProps<"/trade/[slug]">) {
@@ -33,45 +35,55 @@ export default async function TradePage({ params }: PageProps<"/trade/[slug]">) 
   const trade = await getTradeBySlug(slug);
   if (!trade) notFound();
 
-  const [categories, related, hiringCountries] = await Promise.all([
+  const [categories, related, hiringCountries, counts] = await Promise.all([
     getTradeCategories(),
     getRelatedTrades(trade),
     getCountriesHiringTrade(trade.slug),
+    getCandidateCountsByTrade(),
   ]);
   const category = categories.find((c) => c.id === trade.categoryId) ?? null;
+  const profileCount = counts[trade.slug] ?? 0;
 
   return (
-    <Container className="flex flex-col gap-14 py-10 sm:py-14">
-      <div className="flex flex-col gap-8">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: routes.home },
-            { label: "Trades", href: routes.tradeCategories },
-            { label: trade.name },
-          ]}
-        />
-        <TradeDetail trade={trade} category={category} />
-        <div>
-          <ButtonLink href={routes.findCandidatesFor({ trade: trade.slug })}>
-            <Search aria-hidden className="size-4" />
-            Browse {trade.name.toLowerCase()} candidates
-          </ButtonLink>
-        </div>
-      </div>
+    <>
+      <TradeHero
+        trade={trade}
+        category={category}
+        top={
+          <Breadcrumbs
+            tone="light"
+            items={[{ label: "Home", href: routes.home }, { label: "Trades", href: routes.tradeCategories }, { label: trade.name }]}
+          />
+        }
+        actions={
+          <>
+            <ButtonLink href={routes.findCandidatesFor({ trade: trade.slug })} size="lg" variant="secondary" className="bg-white text-navy ring-0 hover:bg-sky">
+              <Search /> {profileCount > 0 ? `Browse ${profileCount} ${profileCount === 1 ? "profile" : "profiles"}` : "Browse workers"}
+            </ButtonLink>
+            <ButtonLink href={routes.register} size="lg" variant="ghost" className="text-white ring-1 ring-white/25 hover:bg-white/10">
+              <UserPlus /> I’m a {trade.name.toLowerCase()}
+            </ButtonLink>
+          </>
+        }
+      />
 
-      {hiringCountries.length > 0 && (
-        <section className="flex flex-col gap-6">
-          <SectionHeading title={`Where ${trade.name.toLowerCase()}s are in demand`} />
-          <CountryGrid countries={hiringCountries} />
-        </section>
-      )}
+      <Container className="flex flex-col gap-16 py-12 sm:gap-20 sm:py-16">
+        <TradeDetail trade={trade} />
 
-      {related.length > 0 && (
-        <section className="flex flex-col gap-6">
-          <SectionHeading title={category ? `More in ${category.name}` : "Related trades"} />
-          <TradeGrid trades={related} />
-        </section>
-      )}
-    </Container>
+        {hiringCountries.length > 0 && (
+          <section className="flex flex-col gap-8">
+            <SectionIntro eyebrow="Destinations" title={`Where ${trade.name.toLowerCase()}s`} highlight="are in demand." />
+            <CountryGrid countries={hiringCountries} />
+          </section>
+        )}
+
+        {related.length > 0 && (
+          <section className="flex flex-col gap-8">
+            <SectionIntro eyebrow="Related trades" title={category ? `More in ${category.name}` : "Related trades"} />
+            <TradeGrid trades={related} />
+          </section>
+        )}
+      </Container>
+    </>
   );
 }

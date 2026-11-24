@@ -15,16 +15,17 @@ export interface PopularTradeCardData extends PopularTrade {
 }
 
 /* Bento layout on large screens (4 cols × 3 rows): 1 feature, 1 wide, 6 standard. */
+/* Mobile/tablet (2 cols): feature and wide tiles span the full row. */
 const layout = [
-  "lg:col-span-2 lg:row-span-2", // feature
+  "col-span-2 lg:row-span-2", // feature
   "", "",
-  "lg:col-span-2", // wide
+  "col-span-2", // wide
   "", "", "", "",
 ];
 
 export function PopularTradesSection({ trades }: { trades: PopularTradeCardData[] }) {
   return (
-    <section className="py-24 sm:py-32">
+    <section className="py-16 sm:py-24 lg:py-32">
       <Container className="flex flex-col gap-12">
         <SectionIntro
           eyebrow="Popular skills & trades"
@@ -38,7 +39,7 @@ export function PopularTradesSection({ trades }: { trades: PopularTradeCardData[
           }
         />
 
-        <ul className="grid auto-rows-[15rem] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-[14rem]">
+        <ul className="grid auto-rows-[11.5rem] grid-cols-2 gap-3 sm:auto-rows-[15rem] sm:gap-4 lg:auto-rows-[14rem] lg:grid-cols-4">
           {trades.map((trade, index) => (
             <li key={trade.tradeSlug} className={cn(layout[index])}>
               <Reveal delay={(index % 4) * 80} className="h-full">
@@ -57,7 +58,7 @@ function TradeTile({ trade, featured }: { trade: PopularTradeCardData; featured:
   return (
     <Link
       href={routes.trade(trade.tradeSlug)}
-      className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl bg-navy p-5 text-white shadow-soft ring-1 ring-black/5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/60 sm:p-6"
+      className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl bg-navy p-4 text-white shadow-soft ring-1 ring-black/5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/60 active:scale-[0.98] sm:p-6"
     >
       <Image
         src={image.src}
@@ -72,15 +73,15 @@ function TradeTile({ trade, featured }: { trade: PopularTradeCardData; featured:
         <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur-md ring-1 ring-white/20">
           {trade.profileCount} {trade.profileCount === 1 ? "profile" : "profiles"}
         </span>
-        <span className="grid size-9 place-items-center rounded-full bg-white text-navy transition group-hover:rotate-45">
+        <span className="grid size-8 place-items-center rounded-full bg-white text-navy transition group-hover:rotate-45 sm:size-9">
           <ArrowUpRight aria-hidden className="size-4" />
         </span>
       </div>
 
       <div className="relative">
-        <h3 className={cn("font-bold tracking-tight", featured ? "text-3xl sm:text-4xl" : "text-xl")}>{trade.title}</h3>
-        <p className={cn("mt-1.5 text-white/75", featured ? "max-w-sm text-base" : "text-sm")}>{trade.description}</p>
-        <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-white/90 transition lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-visible:opacity-100">
+        <h3 className={cn("font-bold leading-tight tracking-tight", featured ? "text-2xl sm:text-4xl" : "text-base sm:text-xl")}>{trade.title}</h3>
+        <p className={cn("mt-1.5 text-white/75", featured ? "max-w-sm text-sm sm:text-base" : "hidden text-sm sm:block")}>{trade.description}</p>
+        <span className="mt-3 hidden items-center gap-1 text-sm font-semibold text-white/90 transition sm:inline-flex lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-visible:opacity-100">
           Explore workers <ArrowUpRight aria-hidden className="size-3.5" />
         </span>
       </div>
